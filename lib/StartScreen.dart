@@ -12,6 +12,7 @@ class StartScreen extends StatelessWidget {
           'assets/ImageQuizAppLogo/quiz-logo.png',
           width: 200,
           height: 200,
+          color: const Color.fromARGB(150, 255, 255, 255),
         ),
 
         //Size Box To add space between widgets

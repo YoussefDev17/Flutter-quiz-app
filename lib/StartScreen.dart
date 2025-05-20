@@ -29,15 +29,16 @@ class StartScreen extends StatelessWidget {
         //Size Box To add space between widgets
         const SizedBox(height: 20),
 
-        OutlinedButton(
+        OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
             minimumSize: Size(40, 25),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.zero, // Rectangle border
             ),
           ),
+          icon: const Icon(Icons.arrow_right_alt, color: Colors.white),
 
-          child: const Text(
+          label: const Text(
             'Start A Quiz',
             style: TextStyle(
               fontSize: 15,

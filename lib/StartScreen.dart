@@ -41,7 +41,8 @@ class StartScreen extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            onPressed: onStartQuiz, // ✅ FIXED HERE TOO
+            onPressed:
+                onStartQuiz, // Call  The Question Screen To Start The Quiz
           ),
         ],
       ),

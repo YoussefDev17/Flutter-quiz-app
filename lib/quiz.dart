@@ -14,6 +14,7 @@ class _QuizState extends State<Quiz> {
   final Color endColor;
   final Alignment startAlignment;
   final Alignment endAlignment;
+
   // Track which screen to show
   Widget? activeScreen;
 

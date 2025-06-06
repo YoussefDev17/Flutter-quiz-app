@@ -1,55 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/myCustomOutlineButton.dart';
+import 'package:quiz_app/quiz_questions.dart';
 
 class QuestionScreen extends StatefulWidget {
   final VoidCallback onBackToTheStartScreen;
-  const QuestionScreen({super.key, required this.onBackToTheStartScreen});
+  final VoidCallback onGoToSummaryScreen;
+  const QuestionScreen({
+    super.key,
+    required this.onBackToTheStartScreen,
+    required this.onGoToSummaryScreen,
+  });
   @override
   State<QuestionScreen> createState() => _QuestionScreenState();
 }
 
 class _QuestionScreenState extends State<QuestionScreen> {
-  // List of questions with answers and correct answer
-  final List<Question> questions = [
-    Question('What is Flutter?', ['SDK', 'Game', 'Language', 'IDE'], 'SDK'),
-    Question('What is Dart?', ['Language', 'Bird', 'IDE', 'Company'], 'Language'),
-    Question('Who developed Flutter?', ['Apple', 'Facebook', 'Microsoft', 'Google'], 'Google'),
-    Question('What widget is used for layout in Flutter?', [
-      'Text',
-      'Scaffold',
-      'Column',
-      'MaterialApp',
-    ], 'Column'),
-    Question('Which command is used to create a new Flutter project?', [
-      'flutter new project',
-      'flutter create myapp',
-      'flutter start',
-      'flutter init',
-    ], 'flutter new project'),
-  ];
-
   bool IsTheSelectedAnswerChecked = false;
 
-  Widget validateUserAnswer() {
-    // Check The User Not Selected Any Answer
-    if (selectedAnswer == null) {
-      return const SizedBox(
-        width: 25,
-      ); // Same width as the Next And Check button to keep layout aligned
-    }
-    // Check If The User Answer Cheked To Show Them Next Button
-    if (IsTheSelectedAnswerChecked) {
-      return OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(25, 18),
-          shape: const StadiumBorder(), // Oval/pill shape
-          backgroundColor: Colors.deepPurple.shade700,
-        ),
-        onPressed: increaseQuestionIndexAndClearSelectedAnswer,
-        child: const Text("Next", style: TextStyle(color: Colors.white)),
-      );
-    }
+  int currentQuestionIndex = 0;
 
+  String? selectedAnswer;
+
+  bool? isSelectedAnswerCorrect;
+
+  Widget buildNextButton() {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(25, 18),
+        shape: const StadiumBorder(), // Oval/pill shape
+        backgroundColor: Colors.deepPurple.shade700,
+      ),
+      onPressed:
+          (currentQuestionIndex >= questions.length - 1)
+              ? widget.onGoToSummaryScreen
+              : increaseQuestionIndexAndClearSelectedAnswer,
+      child: const Text("Next", style: TextStyle(color: Colors.white)),
+    );
+  }
+
+  Widget buildCheckAnswerButton() {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(25, 18),
@@ -61,17 +50,26 @@ class _QuestionScreenState extends State<QuestionScreen> {
     );
   }
 
-  int currentQuestionIndex = 0;
+  Widget validateUserAnswer() {
+    // Check The User Not Selected Any Answer
+    if (selectedAnswer == null) {
+      return const SizedBox(
+        width: 25,
+      ); // Same width as the Next And Check button to keep layout aligned
+    }
+    // Check If The User Answer Cheked To Show Them Next Button
+    if (IsTheSelectedAnswerChecked) {
+      return buildNextButton(); // Call the function to get the Next button
+    }
 
-  String? selectedAnswer;
-
-  bool? isSelectedAnswerCorrect;
+    return buildCheckAnswerButton(); // Call the function to get the Check button
+  }
 
   Widget buildAnswerButton(String answer, bool? answerStatus) {
     return Column(
       children: [
         AnswerButton(
-          key: ValueKey(answer),
+          key: ValueKey(answer), // Use ValueKey to ensure each button is unique
           text: answer,
           isPressed: answer == selectedAnswer,
           onTap: () => onAnswerSelected(answer),
@@ -99,6 +97,22 @@ class _QuestionScreenState extends State<QuestionScreen> {
     return null; //Not Selected The User Not Chose Yet An Answer
   }
 
+  Widget buildBackButton() {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(25, 18),
+        shape: const StadiumBorder(), // Oval/pill shape
+        backgroundColor: Colors.deepPurple.shade700,
+      ),
+      onPressed:
+          currentQuestionIndex == 0
+              ? null // Disable the button
+              : decreaseQuestionIndex, // Handle back button press
+
+      child: const Text("Back", style: TextStyle(color: Colors.white)),
+    );
+  }
+
   Widget buildNavigationButtons() {
     return SizedBox(
       width: 300, // Match the width of your myCustomButton
@@ -106,19 +120,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           currentQuestionIndex != 0
-              ? OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(25, 18),
-                  shape: const StadiumBorder(), // Oval/pill shape
-                  backgroundColor: Colors.deepPurple.shade700,
-                ),
-                onPressed:
-                    currentQuestionIndex == 0
-                        ? null // Disable the button
-                        : decreaseQuestionIndex, // Handle back button press
-
-                child: const Text("Back", style: TextStyle(color: Colors.white)),
-              )
+              ? buildBackButton() // Call the function to get the Back button
               : const SizedBox(width: 25), // Same width as the Back button to keep layout aligned
 
           validateUserAnswer(), // Call the function to get the button
@@ -138,27 +140,19 @@ class _QuestionScreenState extends State<QuestionScreen> {
       selectedAnswer = null; // Reset selected answer
       isSelectedAnswerCorrect = null; // Reset the correctness state
       IsTheSelectedAnswerChecked = false; // Reset the flag for the next question;
-      if (currentQuestionIndex >= questions.length - 1) {
-        // Reset to the first question if at the end
-        currentQuestionIndex = 0;
 
-        return;
-      }
       currentQuestionIndex++;
     });
   }
 
   void decreaseQuestionIndex() {
     setState(() {
-      // if (currentQuestionIndex <= 0) {
-      //   // Reset to the last question if at the beginning
-      //   currentQuestionIndex = questions.length - 1;
-      //   return;
-      // }
-      selectedAnswer = null; // Reset selected answer
-      isSelectedAnswerCorrect = null; // Reset the correctness state
-      IsTheSelectedAnswerChecked = false; // Reset the flag for the next question;
       currentQuestionIndex--;
+      selectedAnswer = questions[currentQuestionIndex].userAnser; // Reset selected answer
+      isSelectedAnswerCorrect =
+          questions[currentQuestionIndex].userAnser ==
+          questions[currentQuestionIndex].correctAnswer; // Reset the correctness state
+      IsTheSelectedAnswerChecked = true; // Reset the flag for the next question;
     });
   }
 
@@ -172,6 +166,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
         isSelectedAnswerCorrect = false;
       }
       IsTheSelectedAnswerChecked = true; // Set the flag to indicate the answer has been checked
+
+      questions[currentQuestionIndex].userAnser = selectedAnswer; // Save user answer
     });
   }
 
@@ -225,13 +221,4 @@ class _QuestionScreenState extends State<QuestionScreen> {
       ),
     );
   }
-}
-
-// Define the class first
-class Question {
-  final String text;
-  final List<String> answers;
-  final String correctAnswer; // New field
-
-  Question(this.text, this.answers, this.correctAnswer);
 }

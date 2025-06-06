@@ -5,7 +5,7 @@ class AnswerButton extends StatelessWidget {
   final String text;
   final VoidCallback onTap;
   final bool isDisabled;
-  bool? ButtonState;
+  final bool? ButtonState;
 
   AnswerButton({
     super.key,
@@ -13,7 +13,7 @@ class AnswerButton extends StatelessWidget {
     required this.isPressed,
     required this.onTap,
     required this.isDisabled,
-    this.ButtonState, // nullable, defaults to null
+    this.ButtonState, // This Is Used To know the state of the button (correct, incorrect, or null)
   });
 
   @override
@@ -22,18 +22,8 @@ class AnswerButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         backgroundColor:
             isPressed
-                ? const Color.fromARGB(
-                  255,
-                  146,
-                  76,
-                  168,
-                ) // Purple color when pressed
-                : const Color.fromARGB(
-                  255,
-                  49,
-                  1,
-                  69,
-                ), // Purple color when not pressed
+                ? const Color.fromARGB(255, 146, 76, 168) // Purple color when pressed
+                : const Color.fromARGB(255, 49, 1, 69), // Purple color when not pressed
         minimumSize: const Size(300, 30),
         shape: const StadiumBorder(), // Oval/pill shape
         side: BorderSide(
@@ -55,66 +45,7 @@ class AnswerButton extends StatelessWidget {
 
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
-class MyCustomButton extends StatefulWidget {
-  final String text;
-
-  const MyCustomButton({super.key, required this.text});
-
-  @override
-  State<MyCustomButton> createState() => _MyCustomButtonState();
-}
-
-class _MyCustomButtonState extends State<MyCustomButton> {
-  // final VoidCallback onPressed;
-  bool isPressed = false;
-
-  void IsButtonPressed() {
-    setState(() {
-      isPressed = !isPressed;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        backgroundColor:
-            isPressed
-                ? const Color.fromARGB(
-                  255,
-                  201,
-                  120,
-                  225,
-                ) // Purple color when pressed
-                : const Color.fromARGB(
-                  255,
-                  49,
-                  1,
-                  69,
-                ), // Purple color when not pressed
-        minimumSize: const Size(300, 30),
-        shape: const StadiumBorder(), // Oval/pill shape
-        side: const BorderSide(width: 0), // Border
-      ),
-      onPressed: IsButtonPressed,
-
-      child: Text(
-        widget.text,
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }

@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/quiz_questions.dart';
+// import 'package:quiz_app/UserAnswers.dart';
 
 class SummaryScreen extends StatelessWidget {
   //this Screen It Used To Show Summarize Of The Screen
   final VoidCallback onBackToRestartTheQuiz;
   // Calcul The number of correct answers
-  final int correctAnswers = questions.where((q) => q.userAnser == q.correctAnswer).length;
+  // final int correctAnswers = questions.where((q) => q.userAnser == q.correctAnswer).length;
+  final List<String> userAnswers;
+  int CalculCorrectAnswers() {
+    return List.generate(
+      userAnswers.length,
+      (i) => i,
+    ).where((i) => userAnswers[i] == questions[i].correctAnswer).length;
+  }
 
   Widget _buildTextTitle() {
+    final correctAnswers = CalculCorrectAnswers();
     return Text(
       'you Answered ${correctAnswers} out of ${questions.length} questions correctly',
       textAlign: TextAlign.center, // 👈 Center each line
@@ -39,12 +48,13 @@ class SummaryScreen extends StatelessWidget {
   }
 
   Widget _printQuetionNumberAndStyled(int index) {
+    bool IsCorrect = userAnswers[index] == questions[index].correctAnswer;
     return Container(
       width: 25,
       height: 25,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Colors.green, // or Colors.red depending on the result
+        color: IsCorrect ? Colors.green : Colors.red, // or Colors.red depending on the result
         shape: BoxShape.circle,
       ),
       child: Text(
@@ -58,7 +68,7 @@ class SummaryScreen extends StatelessWidget {
     );
   }
 
-  Widget _printQuestionTextAndanswers(MapEntry<int, Question> entry) {
+  Widget _printQuestionTextAndanswers(MapEntry<int, Question> entry, int index) {
     final question = entry.value;
     return Expanded(
       child: RichText(
@@ -68,15 +78,15 @@ class SummaryScreen extends StatelessWidget {
               text: '${question.text}\n',
               style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
-            (question.userAnser == question.correctAnswer)
+            (userAnswers[index] == question.correctAnswer)
                 ? _buildQuestionStyleDependingOnWhetherTheQuestionIsTrueOrFalse(
                   true,
-                  question.userAnser,
+                  userAnswers[index],
                   null,
                 )
                 : _buildQuestionStyleDependingOnWhetherTheQuestionIsTrueOrFalse(
                   false,
-                  question.userAnser,
+                  userAnswers[index],
                   question.correctAnswer,
                 ),
           ],
@@ -99,7 +109,7 @@ class SummaryScreen extends StatelessWidget {
                 _printQuetionNumberAndStyled(index),
                 const SizedBox(width: 10), // Small space between number and text
                 // RichText for question and answers
-                _printQuestionTextAndanswers(entry),
+                _printQuestionTextAndanswers(entry, index),
               ],
             );
           }).toList(),
@@ -108,9 +118,14 @@ class SummaryScreen extends StatelessWidget {
 
   Widget _buildTheScrollableContent() {
     return SizedBox(
-      height: 350, // Set a fixed height for the scrollable area,
+      height: 300, // Set a fixed height for the scrollable area,
       child: SingleChildScrollView(child: _printSummaryOfTheQuiz()),
     );
+  }
+
+  void RestartTheQuiz() {
+    userAnswers.clear(); // Clear user answers when going back to start screen
+    onBackToRestartTheQuiz();
   }
 
   Widget _buildRestartQuizButton() {
@@ -124,11 +139,11 @@ class SummaryScreen extends StatelessWidget {
         'Restart The Quiz',
         style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
       ),
-      onPressed: onBackToRestartTheQuiz,
+      onPressed: RestartTheQuiz,
     );
   }
 
-  SummaryScreen({super.key, required this.onBackToRestartTheQuiz});
+  SummaryScreen({super.key, required this.onBackToRestartTheQuiz, required this.userAnswers});
   @override
   Widget build(BuildContext context) {
     return Center(

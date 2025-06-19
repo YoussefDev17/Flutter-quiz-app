@@ -22,6 +22,8 @@ class _QuizState extends State<Quiz> {
   Widget? activeScreen;
   enAppScreen currentScreen = enAppScreen.start;
 
+  List<String> userAnswers = [];
+
   _QuizState.purple()
     : startColor = const Color.fromARGB(255, 86, 1, 122),
       endColor = const Color.fromARGB(255, 150, 0, 195),
@@ -61,10 +63,11 @@ class _QuizState extends State<Quiz> {
         activeScreen = QuestionScreen(
           onBackToTheStartScreen: restartQuiz,
           onGoToSummaryScreen: goToSummaryScreen,
+          userAnswers: userAnswers,
         );
         break;
       case enAppScreen.summary:
-        activeScreen = SummaryScreen(onBackToRestartTheQuiz: restartQuiz);
+        activeScreen = SummaryScreen(onBackToRestartTheQuiz: restartQuiz, userAnswers: userAnswers);
         break;
     }
   }

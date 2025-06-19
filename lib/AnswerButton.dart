@@ -18,8 +18,8 @@ class AnswerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      style: OutlinedButton.styleFrom(
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
         backgroundColor:
             isPressed
                 ? const Color.fromARGB(255, 146, 76, 168) // Purple color when pressed

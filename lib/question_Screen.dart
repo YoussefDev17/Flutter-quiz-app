@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_app/myCustomOutlineButton.dart';
+import 'package:quiz_app/AnswerButton.dart';
 import 'package:quiz_app/quiz_questions.dart';
+// import 'package:quiz_app/UserAnswers.dart';
 
 class QuestionScreen extends StatefulWidget {
   final VoidCallback onBackToTheStartScreen;
   final VoidCallback onGoToSummaryScreen;
+  final List<String> userAnswers;
   const QuestionScreen({
     super.key,
     required this.onBackToTheStartScreen,
     required this.onGoToSummaryScreen,
+    required this.userAnswers,
   });
   @override
   State<QuestionScreen> createState() => _QuestionScreenState();
@@ -22,6 +25,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
   String? selectedAnswer;
 
   bool? isSelectedAnswerCorrect;
+
+  // List<String> userAnswers = [];
 
   Widget buildNextButton() {
     return OutlinedButton(
@@ -104,11 +109,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
         shape: const StadiumBorder(), // Oval/pill shape
         backgroundColor: Colors.deepPurple.shade700,
       ),
-      onPressed:
-          currentQuestionIndex == 0
-              ? null // Disable the button
-              : decreaseQuestionIndex, // Handle back button press
-
+      onPressed: decreaseQuestionIndex, // Handle back button press
+      // currentQuestionIndex == 0
+      //         ? null // Disable the button
+      //         :
       child: const Text("Back", style: TextStyle(color: Colors.white)),
     );
   }
@@ -137,23 +141,39 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   void increaseQuestionIndexAndClearSelectedAnswer() {
     setState(() {
+      currentQuestionIndex++;
+      // Check if the current question The User Answerd Before
+      if (currentQuestionIndex <= widget.userAnswers.length - 1) {
+        selectedAnswer = widget.userAnswers[currentQuestionIndex]; // Reset selected answer
+        isSelectedAnswerCorrect =
+            selectedAnswer ==
+            questions[currentQuestionIndex].correctAnswer; // Reset the correctness state
+        IsTheSelectedAnswerChecked = true; // Reset the flag for the next question;
+        return;
+      }
+
       selectedAnswer = null; // Reset selected answer
       isSelectedAnswerCorrect = null; // Reset the correctness state
       IsTheSelectedAnswerChecked = false; // Reset the flag for the next question;
-
-      currentQuestionIndex++;
     });
   }
 
   void decreaseQuestionIndex() {
     setState(() {
       currentQuestionIndex--;
-      selectedAnswer = questions[currentQuestionIndex].userAnser; // Reset selected answer
+      // selectedAnswer = questions[currentQuestionIndex].userAnser; // Reset selected answer
+      selectedAnswer =
+          widget.userAnswers[currentQuestionIndex]; // Reset selected answer from the list
       isSelectedAnswerCorrect =
-          questions[currentQuestionIndex].userAnser ==
+          // questions[currentQuestionIndex].userAnser ==
+          widget.userAnswers[currentQuestionIndex] ==
           questions[currentQuestionIndex].correctAnswer; // Reset the correctness state
       IsTheSelectedAnswerChecked = true; // Reset the flag for the next question;
     });
+  }
+
+  void ChooseAnswer(String answer) {
+    widget.userAnswers.add(answer); // Add the selected answer to the list
   }
 
   void checkSelectedAnswerIsCorrect() {
@@ -167,7 +187,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
       }
       IsTheSelectedAnswerChecked = true; // Set the flag to indicate the answer has been checked
 
-      questions[currentQuestionIndex].userAnser = selectedAnswer; // Save user answer
+      // questions[currentQuestionIndex].userAnser = selectedAnswer; // Save user answer
+
+      ChooseAnswer(selectedAnswer!); // Add the selected answer to the list .
+      //I’m sure this selectedAnswer is not null at this moment
     });
   }
 
@@ -175,7 +198,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
     return Text(
       questions[currentQuestionIndex].text,
       style: TextStyle(fontSize: 24, color: Colors.white),
+      textAlign: TextAlign.center,
     );
+  }
+
+  void ResetQuizAnswersAndBackToStartScreen() {
+    widget.userAnswers.clear(); // Clear user answers when going back to start screen
+    widget.onBackToTheStartScreen;
   }
 
   Widget buildButtonBackToStartScreen() {
@@ -190,7 +219,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
         style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
       ),
 
-      onPressed: widget.onBackToTheStartScreen, // Access from widget
+      onPressed: ResetQuizAnswersAndBackToStartScreen, // Access from widget
     );
   }
 
